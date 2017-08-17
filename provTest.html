@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script>
+var width = 960,
+                  height = 500,
+                  radius = 6;
+
+              // var nodes = [
+              //     { node:0, name:"test0", info: [], nodeType: "core", objId: 123},
+              //     { node:1, name:"test1", info: [], nodeType: "core", objId: 1234},
+              //     { node:2, name:"test2", info: [], nodeType: "core", objId: 12345},
+              //     { node:3, name:"test3", info: [], nodeType: "core", objId: 12345},
+              //     { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
+              //     { node:5, name:"test5", info: [], nodeType: "core", objId: 12345},
+              //     { node:6, name:"test6", info: [], nodeType: "core", objId: 12345},
+              //     { node:7, name:"test7", info: [], nodeType: "core", objId: 12345},
+              //     { node:8, name:"test8", info: [], nodeType: "core", objId: 12345},
+              //     { node:9, name:"test9", info: [], nodeType: "core", objId: 12345}
+              //
+              // ];
+              var nodes = [
+
+                  { node:0, name:"test0", info: [], nodeType: "core", objId: 1},
+                  { node:1, name:"test1", info: [], nodeType: "core", objId: 12},
+                  { node:2, name:"test2", info: [], nodeType: "core", objId: 123},
+                  { node:3, name:"test3", info: [], nodeType: "core", objId: 1234},
+                  { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
+                  { node:5, name:"test5", info: [], nodeType: "core", objId: 123456}
+              ];
+
+              var newNodes = [
+                { node:3, name:"test3", info: [], nodeType: "core", objId: 1234},
+                { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
+                { node:5, name:"test5", info: [], nodeType: "core", objId: 123456}
+              ];
+              //
+              //
+              // var nodes = provenanceGraph.nodes;
+
+              // console.log(provenanceGraph.links);
+              // var links = provenanceGraph.links;
+              var links = [
+                  { source: 0, target: 1, linkNum : 0 },
+                  { source: 0, target: 2, linkNum : 1 }
+
+              ];
+
+              var links2 = [
+                  { source: 2, target: 3 , linkNum : 2},
+                  { source: 2, target: 4 , linkNum : 3}
+
+              ];
+              var fill = d3.scale.category20();
+
+
+              var force = d3.layout.force()
+                  .charge(-120)
+                  .linkDistance(30)
+                  .size([width, height])
+                  .nodes(nodes)
+                  .links(links)
+                  .on("tick", tick)
+                  .start();
+
+              var svg = d3.select("body").append("svg")
+                  .attr("width", width)
+                  .attr("height", height);
+
+
+                var g = svg.append("g").attr("transform", "translate(32," + (height / 2) + ")");
+
+
+
+                var node = g.selectAll("circle")
+                    .data(nodes, function(d) { return d.node; })
+                    .enter().append("circle")
+                    .attr("r", radius - .75)
+                    .on('click', click)
+                    .style('fill', "pink")
+                    .style("stroke", "black");
+
+                // var node = g.selectAll("circle")
+                //     .data(newNodes, function(d) { return d.node; })
+                //     .enter().append("circle")
+                //     .attr("r", radius - .75)
+                //     .attr("cx", function(d) { return d.x; })
+                //     .on('click', click)
+                //     .style('fill', "green")
+                //     .style("stroke", "black");
+                    // .style("fill", function(d) { return fill(d.group); })
+                    // .style("stroke", function(d) { return d3.rgb(fill(d.group)).darker(); });
+                    // // .call(force.drag);
+                // var node;
+
+                var link = g.selectAll("line")
+                    .data(links , function(d) {return d.linkNum; })
+                    .enter().append("line")
+                    .style("stroke", 'black');
+                //
+                // var link2 = g.selectAll("line")
+                //     .data(links2 , function(d) {return d.linkNum; })
+                //     .enter().append("line")
+                //     .style("stroke", 'black');
+
+
+
+                // var link = g.selectAll("line")
+                //     .data(links, function(d) {return d.linkNum; })
+                //     .enter().append("line")
+                //     .style("stroke", 'black')
+
+
+                var nodelabels = g.selectAll(".nodelabel")
+                    .data(nodes)
+                    .enter()
+                    .append("text")
+                    .attr({"x":function(d){return d.x;},
+                           "y":function(d){return d.y;},
+                           "class":"nodelabel",
+                           "stroke":"black"})
+                    .text(function(d){return d.name;});
+
+
+
+                function tick(e) {
+                  var k = 6 * e.alpha;
+
+                  // Push sources up and targets down to form a weak tree.
+                  link
+                      .each(function(d) {d.source.y -= k, d.target.y += k; })
+                      .attr("x1", function(d) { return d.source.x; })
+                      .attr("y1", function(d) { return d.source.y; })
+                      .attr("x2", function(d) { return d.target.x; })
+                      .attr("y2", function(d) { return d.target.y; });
+
+                  g.selectAll("circle")
+                      .attr("cx", function(d) { return d.x; })
+                      .attr("cy", function(d) { return d.y; });
+
+                  nodelabels.attr("x", function(d) { return d.x; })
+                      .attr("y", function(d) { return d.y; });
+
+
+                }
+
+
+                function update(nodesData){
+                  var newnode = d3.select('g').selectAll("circle")
+                      .data( nodesData, function(d) { return d.objId; })
+
+                  newnode.enter()
+                      .append("circle")
+                      .attr("r", radius - .75)
+                      .attr("cx", function(d) {return d.x; })
+                      .attr("cy", function(d) { return d.y; })
+                      .style('fill', "green")
+                      .style('stroke', 'green');
+
+
+
+                }
+                function click(data){
+                  // var newData = { node:3, name:"test3", info: [], nodeType: "core", objId: 12345};
+                  // update([newData]);
+                }
+                // update([{}]);
+                // update(nodes);
+                // update(newData);
+                // setTimeout(function(){ update(newData); }, 3000);
+
+
+</script>
