@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+text {
+  font: 10px sans-serif;
+}
+
+line {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var width = 960,
+    height = 500;
+
+var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1},
+    b = { node:1, name:"test1", info: [], nodeType: "core", objId: 12},
+    c = { node:2, name:"test2", info: [], nodeType: "core", objId: 123},
+    e = { node:3, name:"test3", info: [], nodeType: "core", objId: 1234},
+    f = { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
+    nodes = [a, b, c],
+    links = [{source: 0, target: 1},
+            {source: 0, target: 2}];
+
+var force = d3.layout.force()
+    .nodes(nodes)
+    .links(links)
+    .size([width, height]);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var loading = svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height / 2)
+    .attr("dy", ".35em")
+    .style("text-anchor", "middle")
+    .text("Simulating. One moment please…");
+
+// Use a timeout to allow the rest of the page to load first.
+setTimeout(function() {
+
+  // Put a lightweight wrapper around force.tick which will
+  // delegate to force.tick to do the computing and will
+  // return true afterwards. Upon the first call to .tick
+  // this will immediately break from the running timer
+  // giving us the opportunity to run the iterations in our own loop
+  force.tick = (function(forceTick) {
+    return function() {
+      forceTick();
+      return true;
+    }
+  }(force.tick));
+
+  // To run the computing steps in our own loop we need
+  // to manage the cooling by ourselves.
+  var alphaStart = 0.1;
+  var alphaEnd   = 0.005;
+  var alpha      = alphaStart;
+  var steps      = 100;
+  var cooling = Math.pow(alphaEnd / alphaStart, 1 / steps);
+
+  // Calling start will initialize our layout and start the timer
+  // doing the actual calculations. This timer will halt, however,
+  // on the first call to .tick.
+  force.start();
+
+  // The loop will execute tick() a fixed number of times.
+  // Throughout the loop the cooling of the system is controlled
+  // by decreasing alpha to reach the freezing point once
+  // the desired number of steps is performed.
+  for (var i = 0; i < steps; i++) {
+    force.alpha(alpha*=cooling).tick();
+  }
+  force.stop();
+
+  svg.selectAll("line")
+      .data(links)
+    .enter().append("line")
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  svg.selectAll("circle")
+      .data(nodes)
+    .enter().append("circle")
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .attr("r", 4.5);
+
+  loading.remove();
+}, 10);
+
+</script>
