@@ -95,7 +95,9 @@ var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1},
 
 function render() {
   // randomData();
-  force.nodes(nodes).links(links);
+  force.nodes(nodes)
+        .links(links)
+        .on("tick", tick);
 
   svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -112,6 +114,8 @@ function render() {
   node = svg.selectAll(".node");
 
   force.start();
+  for (var i = 100; i > 0; --i) force.tick();
+  force.stop();
 }
 
 function update() {
@@ -139,20 +143,23 @@ function update() {
 
   // link.style("stroke-width", function(d) { return d.weight; });
 
-  node.select("circle").attr("r", 1);
-
+  node.select("circle").attr("r", 10);
   force.start();
+  for (var i = 100; i > 0; --i) force.tick();
+  force.stop();
 }
 
 function enterNodes(n) {
   var g = n.enter().append("g")
-    .attr("class", "node");
+    .attr("class", "node")
+    .call(force.drag);
+    // .call(function(node) { node.transition().attr("r", 8); });
 
   g.append("circle")
     .attr("cx", 0)
     .attr("cy", 0)
-    .attr("r", 1)
-    .call(force.drag);
+    .attr("r", 10)
+    // .call(force.drag);
 
   g.append("text")
     .attr("dy", ".35em")
@@ -176,7 +183,6 @@ function exitLinks(l) {
 function maintainNodePositions() {
   var kv = {};
   oldNodes.forEach( function(d) {
-    debugger;
     d.fixed = true;
     kv[d.name] = d;
   });
@@ -193,7 +199,7 @@ function maintainNodePositions() {
   // });
 }
 
-force.on("tick", function(e) {
+ function tick(e) {
   var k = 10 * e.alpha;
   // Push sources up and targets down to form a weak tree.
   link
@@ -207,7 +213,7 @@ force.on("tick", function(e) {
     .attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; })
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-});
+};
 
 
 
