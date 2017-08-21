@@ -204,7 +204,7 @@ function dblClick(node){
   d3.select(this).attr("fill","green");
   for(let i = 0; i < node.references.length; i++){
     let linkId =node.references[i];
-    d3.select(linkId).style("stroke", "blue");
+    d3.select(linkId).style("display", "none");
   }
 
   // var selectedLink = svg.select(node.references[0]).attr("fill", "blue");
