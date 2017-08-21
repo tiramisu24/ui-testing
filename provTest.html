@@ -51,48 +51,18 @@ var width = 400,
     .linkDistance(50)
     .size([width, height]);
 
-var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1},
-    b = { node:1, name:"test1", info: [], nodeType: "core", objId: 12},
-    c = { node:2, name:"test2", info: [], nodeType: "core", objId: 123},
-    e = { node:3, name:"test3", info: [], nodeType: "core", objId: 1234},
-    f = { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
+var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1, references :[]},
+    b = { node:1, name:"test1", info: [], nodeType: "core", objId: 12, references :[]},
+    c = { node:2, name:"test2", info: [], nodeType: "core", objId: 123, references :[]},
+    e = { node:3, name:"test3", info: [], nodeType: "core", objId: 1234, references :[]},
+    f = { node:4, name:"test4", info: [], nodeType: "core", objId: 12345, references :[]},
     nodes = [a, b, c],
-    links = [{source: a, target: b},
-            {source: a, target: 2}];
+    links = [{source: 0, target: 1},
+            {source: 0, target: 2}];
 
-// function randomData() {
-//   oldNodes = nodes;
-//   // generate some data randomly
-//   nodes = _.chain(_.range(_.random(10, 20)))
-//     .map(function() {
-//       var node = {};
-//       node.key = _.random(0, 30);
-//       node.weight = _.random(4, 10);
-//
-//       return node;
-//     }).uniq(function(node) {
-//       return node.key
-//     }).value();
-//
-//   if (oldNodes) {
-//     var add = _.initial(oldNodes, _.random(0, oldNodes.length));
-//     add = _.rest(add, _.random(0, add.length));
-//
-//     nodes = _.union(nodes, add);
-//   }
-//
-//   links = _.map(_.range(_.random(15, 25)), function() {
-//       var link = {};
-//       link.source = _.random(0, nodes.length - 1);
-//       link.target = _.random(0, nodes.length - 1);
-//       link.weight = _.random(1, 3);
-//
-//       return link;
-//     });
-//     debugger;
-//   maintainNodePositions();
-//
-// }
+    a.references.push("#path" + links[0].source + "_" + links[0].target);
+    a.references.push("#path" + links[1].source + "_" + links[1].target);
+
 
 function render() {
   // randomData();
@@ -105,7 +75,7 @@ function render() {
     .attr("height", height);
 
   var l = svg.selectAll(".link")
-    .data(links, function(d) {return d.source + "," + d.target});
+    .data(links, function(d) {return d.source + "_" + d.target});
   var n = svg.selectAll(".node")
     .data(nodes, function(d) {return d.name});
   enterLinks(l);
@@ -131,7 +101,7 @@ function update() {
   force.nodes(nodes).links(links);
 
   var l = svg.selectAll(".link")
-    .data(links, function(d) {return d.source + "," + d.target});
+    .data(links, function(d) {return d.source + "_" + d.target});
   var n = svg.selectAll(".node")
     .data(nodes, function(d) {return d.name});
   enterLinks(l);
@@ -171,6 +141,7 @@ function enterNodes(n) {
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("r", radius)
+    .on('dblclick', dblClick)
     .style("fill", "pink");
     // .call(force.drag);
 
@@ -187,8 +158,7 @@ function exitNodes(n) {
 function enterLinks(l) {
   l.enter().insert("line", ".node")
     .attr("class", "link")
-    .attr("id", function(d){return d.source.objId + "," +  d.target.objId;})
-    .on('click', linkClick)
+    .attr("id", function(d){return "path" + d.source + "_" +  d.target})
     .style("stroke-width", function(d) { return 10; });
 }
 
@@ -230,7 +200,22 @@ function maintainNodePositions() {
       .attr("y2", function(d) { return d.target.y; });
 
 };
-function linkClick(link){
+function dblClick(node){
+  d3.select(this).attr("fill","green");
+  for(let i = 0; i < node.references.length; i++){
+    let linkId =node.references[i];
+    d3.select(linkId).style("stroke", "blue");
+  }
+
+  // var selectedLink = svg.select(node.references[0]).attr("fill", "blue");
+  // var selectedLink2 = d3.select('#path0_1')
+                      // .style("stroke", "blue");
+  // debugger;
+  // var selectedLink = d3.select('#0/1')
+
+
+
+
   // debugger;
     // link.classed('remove',true);
   // d3.select(this).classed("remove",true);
