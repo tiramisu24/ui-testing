@@ -57,8 +57,8 @@ var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1},
     e = { node:3, name:"test3", info: [], nodeType: "core", objId: 1234},
     f = { node:4, name:"test4", info: [], nodeType: "core", objId: 12345},
     nodes = [a, b, c],
-    links = [{source: 0, target: 1},
-            {source: 0, target: 2}];
+    links = [{source: a, target: b},
+            {source: a, target: 2}];
 
 // function randomData() {
 //   oldNodes = nodes;
@@ -127,8 +127,7 @@ function update() {
   nodes.push(f);
   links.push({source: 2, target: 3});
   links.push({source: 2, target: 4});
-  // debugger;
-  // randomData();
+
   force.nodes(nodes).links(links);
 
   var l = svg.selectAll(".link")
@@ -136,6 +135,7 @@ function update() {
   var n = svg.selectAll(".node")
     .data(nodes, function(d) {return d.name});
   enterLinks(l);
+  //add different selector
   // exitLinks(l);
   enterNodes(n);
   exitNodes(n);
@@ -171,10 +171,12 @@ function enterNodes(n) {
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("r", radius)
+    .style("fill", "pink");
     // .call(force.drag);
 
   g.append("text")
-    .attr("dy", ".35em")
+    .attr("dy", "1.5em")
+    .attr("dx", ".5em")
     .text(function(d) {return d.name});
 }
 
@@ -185,7 +187,9 @@ function exitNodes(n) {
 function enterLinks(l) {
   l.enter().insert("line", ".node")
     .attr("class", "link")
-    .style("stroke-width", function(d) { return d.weight; });
+    .attr("id", function(d){return d.source.objId + "," +  d.target.objId;})
+    .on('click', linkClick)
+    .style("stroke-width", function(d) { return 10; });
 }
 
 function exitLinks(l) {
@@ -226,7 +230,15 @@ function maintainNodePositions() {
       .attr("y2", function(d) { return d.target.y; });
 
 };
-
+function linkClick(link){
+  // debugger;
+    // link.classed('remove',true);
+  // d3.select(this).classed("remove",true);
+  // d3.select(link.target).classed("remove",true);
+  // link.target.attr('class', 'remove-link');
+  // debugger;
+  //TODO: tree prune
+}
 
 
 render();
