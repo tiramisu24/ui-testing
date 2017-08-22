@@ -51,9 +51,9 @@ var width = 400,
     .linkDistance(50)
     .size([width, height]);
 
-var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1, references :[]},
-    b = { node:1, name:"test1", info: [], nodeType: "core", objId: 12, references :[]},
-    c = { node:2, name:"test2", info: [], nodeType: "core", objId: 123, references :[]},
+var a = { node:0, name:"test0", info: [], nodeType: "core", objId: 1/0, references :[]},
+    b = { node:1, name:"test1", info: [], nodeType: "core", objId: 1/2/4, references :[]},
+    c = { node:2, name:"test2", info: [], nodeType: "core", objId: 1/2/3, references :[]},
     e = { node:3, name:"test3", info: [], nodeType: "core", objId: 1234, references :[]},
     f = { node:4, name:"test4", info: [], nodeType: "core", objId: 12345, references :[]},
     nodes = [a, b, c],
@@ -159,6 +159,7 @@ function enterLinks(l) {
   l.enter().insert("line", ".node")
     .attr("class", "link")
     .attr("id", function(d){return "path" + d.source + "_" +  d.target})
+    .on('dblclick', clickTest)
     .style("stroke-width", function(d) { return 10; });
 }
 
@@ -205,6 +206,8 @@ function dblClick(node){
   for(let i = 0; i < node.references.length; i++){
     let linkId =node.references[i];
     d3.select(linkId).style("display", "none");
+    // var link = d3.select(linkId);
+    // link.classed("my-selector", !link.classed("my-selector"));
   }
 
   // var selectedLink = svg.select(node.references[0]).attr("fill", "blue");
@@ -223,6 +226,9 @@ function dblClick(node){
   // link.target.attr('class', 'remove-link');
   // debugger;
   //TODO: tree prune
+}
+function clickTest(){
+  debugger;
 }
 
 
