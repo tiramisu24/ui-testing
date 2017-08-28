@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<script src='http://d3js.org/d3.v3.min.js'></script>
+<body>
+<script>
+  var data = [
+
+  { id: 2, name: 'arrow', path: 'M 0,0 m -5,-5 L 5,0 L -5,5 Z', viewbox: '-5 -5 10 10' }
+  ]
+
+  var color = d3.scale.category10(),
+      margin = {top: 50, right: 20, bottom: 30, left: 40},
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+
+  var svg = d3.select('body').append('svg:svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom);
+
+  var defs = svg.append('svg:defs')
+
+  var paths = svg.append('svg:g')
+    .attr('id', 'markers')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  var marker = defs.selectAll('marker')
+    .data(data)
+    .enter()
+    .append('svg:marker')
+      .attr('id', 'markerArrow')
+      .attr('markerHeight', 5)
+      .attr('markerWidth', 5)
+      .attr('markerUnits', 'strokeWidth')
+      .attr('orient', 'auto')
+      .attr('refX', 0)
+      .attr('refY', 0)
+      .attr('viewBox', '-5 -5 10 10' )
+      .append('svg:path')
+        .attr('d', 'M 0,0 m -5,-5 L 5,0 L -5,5 Z')
+        .attr('fill', "blue");
+
+  var path = paths.selectAll('path')
+    .data(data)
+    .enter()
+    .append('svg:path')
+      .attr('d', function(d,i){ return 'M 0,' + (i * 100) + ' L ' + (width - margin.right) + ',' + (i * 100) + '' })
+      .attr('stroke',"blue")
+      .attr('stroke-width', 5)
+      .attr('stroke-linecap', 'round')
+      .attr('marker-end', 'url(#markerArrow)' )
+</script>
+</body>

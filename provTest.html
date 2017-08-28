@@ -162,6 +162,10 @@ function enterLinks(l) {
     .attr("id", function(d){return "path" + d.source + "_" +  d.target})
     .on('dblclick', clickTest)
     .style("stroke-width", function(d) { return 10; });
+    var defs = svg.append('svg:defs')
+
+
+
 }
 
 function exitLinks(l) {
